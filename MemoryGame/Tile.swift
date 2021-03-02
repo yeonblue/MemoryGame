@@ -7,18 +7,46 @@
 
 import UIKit
 
-let NUM_OF_4X4_TOTAL = 16 // 4X4
-let NUM_OF_6X6_TOTAL = 36 // 4X4
+enum TileStatus {
+    case UNKNOWN, FOUND, FLIPPED
+}
 
 class Tile: UILabel
 {
     var tileNumber: Int?
+    var status: TileStatus = .UNKNOWN
     
     func tileUpdate()
     {
         self.font = UIFont.systemFont(ofSize: 50, weight: .bold)
         self.textAlignment = .center
-        self.text = String(tileNumber ?? 0)
+        
+        switch status {
+        case .UNKNOWN:
+            UIView.transition(with: self,
+                              duration: 0.5,
+                              options: .transitionFlipFromRight ,
+                              animations: {
+                                self.text = "?"
+                                self.backgroundColor = .darkGray
+                              })
+        case .FOUND:
+            UIView.transition(with: self,
+                              duration: 0.5,
+                              options: .transitionFlipFromLeft,
+                              animations: {
+                                self.text = "😆"
+                                self.backgroundColor = .systemGreen
+                              })
+        case .FLIPPED:
+            UIView.transition(with: self,
+                              duration: 0.5,
+                              options: .transitionFlipFromLeft,
+                              animations: {
+                                self.text = String(self.tileNumber!)
+                                self.backgroundColor = .link
+                              })
+        }
     }
 }
 
@@ -27,8 +55,7 @@ extension ViewController
     func makeTiles()
     {
         tiles = []
-        let tileCount = NUM_OF_4X4_TOTAL
-            //gameModeSegmentedControl.selectedSegmentIndex == 0 ? NUM_OF_4X4_TOTAL : NUM_OF_6X6_TOTAL
+        let tileCount = gameMode * gameMode
         let numOfHalfTiles = tileCount / 2
         
         for currentNum in 1...tileCount
